@@ -1,10 +1,11 @@
 import { User } from "./user";
 
 export interface IProfile {
-    username: string;
-    displayName: string;
-    image?: string;
-    bio?: string;
+    username: string
+    displayName: string
+    image?: string
+    bio?: string
+    photo?: Photo[]
 }
 
 export class Profile implements IProfile {
@@ -14,8 +15,15 @@ export class Profile implements IProfile {
         this.image = user.image
     }
 
-    username: string;
-    displayName: string;
-    image?: string;
-    bio?: string;
+    username: string
+    displayName: string
+    image?: string
+    bio?: string
+    photos?: Photo[]
+}
+
+export interface Photo {
+    id: string
+url: string
+    isMain: boolean
 }
