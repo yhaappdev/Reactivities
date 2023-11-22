@@ -4,10 +4,12 @@ import { useStore } from "../../app/stores/store"
 import { Button, Grid, Header, Tab } from "semantic-ui-react"
 import ProfileEditForm from "./ProfileEditForm"
 
+
 export default observer(function ProfileAbout() {
     const {profileStore} = useStore()
     const {isCurrentUser, profile} = profileStore
     const [editMode, setEditMode] = useState(false)
+    
 
     return (
       <Tab.Pane>
@@ -28,7 +30,7 @@ export default observer(function ProfileAbout() {
             )}
           </Grid.Column>
           <Grid.Column width={16}>
-            {editMode ? <ProfileEditForm setEditMode={setEditMode} /> : <span style={{whiteSpace: 'pre-wrap'}}> {profile?.bio} </span>}
+            {editMode ? <ProfileEditForm setEditMode={setEditMode}/> : <span style={{whiteSpace: 'pre-wrap'}}> {profile?.bio} </span>}
           </Grid.Column>
         </Grid>
       </Tab.Pane>
