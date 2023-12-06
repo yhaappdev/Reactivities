@@ -3,5 +3,6 @@ export interface ChatComment {
     createdAt: Date
     body: string
     username: string
+    displayName: string
     image: string
 }

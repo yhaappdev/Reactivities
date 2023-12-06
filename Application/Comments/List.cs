@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Application.Core;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.EntityFrameworkCore;
 using MediatR;
+
 using Persistence;
 
 namespace Application.Comments
@@ -33,7 +33,7 @@ namespace Application.Comments
             {
                 var comments = await _context.Comments
                     .Where(x => x.Activity.Id == request.ActivityId)
-                    .OrderBy(x => x.CreatedAt)
+                    .OrderByDescending(x => x.CreatedAt)
                     .ProjectTo<CommentDto>(_mapper.ConfigurationProvider)
                     .ToListAsync();
                     
