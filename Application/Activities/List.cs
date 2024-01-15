@@ -10,9 +10,12 @@ namespace Application.Activities
 {
     public class List
     {
-        public class Query : IRequest<Result<List<ActivityDto>>> {}
+        public class Query : IRequest<Result<PagedLists<ActivityDto>>> 
+        {
+            public ActivityParams Params { get; set; }
+        }
 
-        public class Handler : IRequestHandler<Query, Result<List<ActivityDto>>>
+        public class Handler : IRequestHandler<Query, Result<PagedLists<ActivityDto>>>
         {
             private readonly DataContext _context;
             private readonly IMapper _mapper;
@@ -24,16 +27,30 @@ namespace Application.Activities
                 _mapper = mapper;
                 _context = context;
             }
-            public async Task<Result<List<ActivityDto>>> Handle(Query request, CancellationToken cancellationToken)
+            public async Task<Result<PagedLists<ActivityDto>>> Handle(Query request, CancellationToken cancellationToken)
             {
                 //projecting to entity - cleaner query
-                var activities = await _context.Activities
+                var query = _context.Activities
+                    .Where(d => d.Date >= request.Params.StartDate)
+                    .OrderBy(d => d.Date)
                     .ProjectTo<ActivityDto>(_mapper.ConfigurationProvider, new {currentUsername = _userAccessor.GetUsername()})
-                    .ToListAsync(cancellationToken);
+                    .AsQueryable();
+
+                if(request.Params.IsGoing && !request.Params.IsHost)
+                {
+                    query = query.Where(x => x.Attendees.Any(a => a.Username == _userAccessor.GetUsername()));
+                }
+
+                if (request.Params.IsHost && !request.Params.IsGoing)
+                {
+                    query = query.Where(x => x.HostUsername == _userAccessor.GetUsername());
+                }
                 
-                var activitiesToReturn = _mapper.Map<List<ActivityDto>>(activities);
+                //var activitiesToReturn = _mapper.Map<List<ActivityDto>>(activities);
                     
-                return Result<List<ActivityDto>>.Success(activitiesToReturn);
+                return Result<PagedLists<ActivityDto>>.Success(
+                    await PagedLists<ActivityDto>.CreateAsync(query, request.Params.PageNumber, request.Params.PageSize)
+                );
             }
         }
     }
